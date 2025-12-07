@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import DatePickerInput from './datePickerInput/DatePickerInput.vue'
 import DatePickerVisual from './datePickerVisual/DatePickerVisual.vue'
-import { inject, ref } from 'vue'
+import { inject, ref, watch } from 'vue'
 import CalendarIcon from './icons/CalendarIcon.vue'
 
 const internalDate = defineModel<Date>()
 const textField = ref<typeof DatePickerInput>()
 
 const dateSelectorOpen = ref(false)
+watch(dateSelectorOpen, (isOpen) => {
+  if (!isOpen) {
+    textField.value?.$el?.focus()
+  }
+})
 
 const isError = inject('isError') as boolean
 </script>

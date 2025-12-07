@@ -56,4 +56,18 @@ const dialogPosition = computed(() => {
   padding: 16px;
   box-shadow: var(--ldp-shadow);
 }
+
+.fade-enter-active {
+  transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+.fade-leave-active {
+  transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
 </style>
