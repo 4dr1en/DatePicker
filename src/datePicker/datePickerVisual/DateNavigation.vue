@@ -9,7 +9,7 @@ const visibleMonth = defineModel<number>('visibleMonth', { required: true })
 const visibleYear = defineModel<number>('visibleYear', { required: true })
 
 const currentMonthName = computed(() => {
-  const browserLocale = navigator.language || 'fr-FR'
+  const browserLocale = navigator.language
   return new Intl.DateTimeFormat(browserLocale, { month: 'long' }).format(
     new Date(0, visibleMonth.value - 1),
   )
@@ -19,11 +19,11 @@ const currentMonthName = computed(() => {
 <template>
   <div class="date-navigation">
     <div class="date-navigation__selects">
-      <button class="date-navigation__select-month" @click="() => (view = 'months')">
+      <button class="date-navigation__select-month" @click="() => (view = view !== 'months' ? 'months' : 'days')">
         {{ currentMonthName }}
         <ChevronDropdownIcon fill="var(--ldp-interface-color)" />
       </button>
-      <button class="date-navigation__select-year" @click="() => (view = 'years')">
+      <button class="date-navigation__select-year" @click="() => (view = view !== 'years' ? 'years' : 'days')">
         {{ visibleYear }}
         <ChevronDropdownIcon fill="var(--ldp-interface-color)" />
       </button>

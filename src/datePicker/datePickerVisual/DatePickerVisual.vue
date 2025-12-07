@@ -40,7 +40,7 @@ watch(open, (isOpen) => {
 })
 
 const selectedDate = computed(() => {
-  return new Intl.DateTimeFormat(navigator.language || 'fr-FR', {
+  return new Intl.DateTimeFormat(navigator.language, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -74,7 +74,7 @@ const selectedDate = computed(() => {
         @update:modelValue="
           (year: number) => {
             visibleYear = year
-            view = 'months'
+            view = 'days'
           }
         "
       />

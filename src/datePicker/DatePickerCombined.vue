@@ -28,6 +28,7 @@ const isError = inject('isError') as boolean
       v-model="internalDate"
       v-model:open="dateSelectorOpen"
       :text-field-ref="textField?.$el"
+      @update:model-value="dateSelectorOpen = false"
     />
   </div>
 </template>
