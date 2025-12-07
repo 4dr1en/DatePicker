@@ -61,9 +61,9 @@ const selectedDate = computed(() => {
       />
       <DaySelector
         v-if="view === 'days'"
-        :month="visibleMonth"
-        :year="visibleYear"
         :selected="modelValue"
+        v-model:visibleMonth="visibleMonth"
+        v-model:visibleYear="visibleYear"
         @model:selected="(selected) => emits('update:modelValue', selected)"
       />
       <YearSelector

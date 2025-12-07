@@ -1,42 +1,35 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import DayCard from './DayCard.vue'
+import { useDaysOfMonth } from './useDaysOfMonth';
+import { useDaysGrid } from './useDaysGrid';
 
 const props = defineProps<{
-  month: number
-  year: number
+  visibleMonth: number
+  visibleYear: number
   selected?: Date
 }>()
 
 const emits = defineEmits<{
   (event: 'model:selected', value: Date): void
+  (event: 'update:visibleMonth', value: number): void
+  (event: 'update:visibleYear', value: number): void
 }>()
 
-const daysInMonth = computed(() => {
-  return new Date(props.year, props.month, 0).getDate()
-})
-
-const daysInPrevMonth = computed(() => {
-  return new Date(props.year, props.month - 1, 0).getDate()
-})
-
-const daysToDisplay = computed<Array<Date>>(() => {
-  const days: Array<Date> = []
-  const nShowPrevious = (new Date(props.year, props.month - 1, 1).getDay() + 6) % 7
-
-  const startPrevMonthDay = daysInPrevMonth.value - (nShowPrevious - 1)
-  for (let i = startPrevMonthDay; i <= daysInPrevMonth.value; i++) {
-    days.push(new Date(props.year, props.month - 2, i))
+const headerDays = computed(() => {
+  const formatter = new Intl.DateTimeFormat(navigator.language, { weekday: 'long' })
+  const days: string[] = []
+  for (let i = 0; i < 7; i++) {
+    const day = formatter.format(new Date(2024, 0, i + 1)) // January 1, 2024 is a Monday
+    days.push(day)
   }
-  for (let i = 1; i <= daysInMonth.value; i++) {
-    days.push(new Date(props.year, props.month - 1, i))
-  }
-  for (let i = 1; days.length % 7 !== 0; i++) {
-    days.push(new Date(props.year, props.month, i))
-  }
-
   return days
 })
+
+const { weeks } = useDaysOfMonth(
+  computed(() => props.visibleMonth),
+  computed(() => props.visibleYear),
+)
 
 function isSelectedDay(day: Date): boolean {
   return day.toDateString() === props.selected?.toDateString()
@@ -46,39 +39,60 @@ function selectDay(day: Date) {
   emits('model:selected', day)
 }
 
-const headerDays = computed(() => {
-  const formatter = new Intl.DateTimeFormat(navigator.language, { weekday: 'narrow' })
-  const days: string[] = []
-  for (let i = 0; i < 7; i++) {
-    const day = formatter.format(new Date(2024, 0, i + 1)) // January 1, 2024 is a Monday
-    days.push(day)
-  }
-  return days
-})
+const {
+  isActiveDay,
+  selectNextDay,
+  selectPreviousDay,
+  selectNextWeek,
+  selectPreviousWeek,
+} = useDaysGrid(
+  computed(() => props.selected || null),
+  computed(() => props.visibleMonth),
+  computed(() => props.visibleYear),
+  (month: number) => emits('update:visibleMonth', month),
+  (year: number) => emits('update:visibleYear', year),
+)
+
 </script>
 
 <template>
-  <div class="day-selector">
-    <div class="day-selector__cols" aria-hidden="true">
-      <div class="day-selector__col" v-for="day in headerDays" :key="day">
-        {{ day }}
-      </div>
-    </div>
-    <div class="day-selector__body">
-      <DayCard
-        v-for="dayToDispay in daysToDisplay"
-        :isDisplayedMonth="dayToDispay.getMonth() + 1 === props.month"
-        :key="dayToDispay.toDateString()"
-        :day="dayToDispay"
-        :selected="isSelectedDay(dayToDispay)"
-        @click="selectDay(dayToDispay)"
-      />
-    </div>
-  </div>
+  <table class="day-selector">
+    <thead>
+      <tr class="day-selector__cols" aria-hidden="true">
+        <th
+          class="day-selector__col"
+          v-for="day in headerDays"
+          :key="day"
+          :aria-label="day"
+          scope="col"
+        >
+          {{ day.charAt(0) }}
+        </th>
+      </tr>
+    </thead>
+    <tbody class="day-selector__body" role="grid"
+      @keydown.right="selectNextDay"
+      @keydown.left="selectPreviousDay"
+      @keydown.down="selectNextWeek"
+      @keydown.up="selectPreviousWeek"
+    >
+      <tr v-for="(week, index) in weeks" :key="index" role="row">
+        <td v-for="dayToDisplay in week" :key="dayToDisplay.toDateString()" role="gridcell">
+          <DayCard
+            :isDisplayedMonth="dayToDisplay.getMonth() + 1 === props.visibleMonth"
+            :day="dayToDisplay"
+            :selected="isSelectedDay(dayToDisplay)"
+            :active="isActiveDay(dayToDisplay)"
+            @click="selectDay(dayToDisplay)"
+          />
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <style lang="scss" scoped>
-.day-selector__body,
+.day-selector__body tr,
 .day-selector__cols {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -87,6 +101,7 @@ const headerDays = computed(() => {
 }
 
 .day-selector__col {
+  text-transform: uppercase;
   text-align: center;
   font-weight: bold;
 }

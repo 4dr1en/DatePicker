@@ -4,6 +4,7 @@ import { computed } from 'vue'
 const props = defineProps<{
   day: Date
   selected?: boolean
+  active?: boolean
   isDisplayedMonth: boolean
 }>()
 
@@ -25,10 +26,12 @@ const longDate = computed(() => {
     class="day-card"
     :class="{
       'day-card--selected': props.selected,
+      'day-card--active': props.active,
       'day-card--fade': !props.isDisplayedMonth,
     }"
     @click="() => emits('click', props.day)"
     :aria-label="longDate"
+    :tabindex="props.active ? '0' : '-1'"
   >
     {{ props.day.getDate() }}
   </button>
