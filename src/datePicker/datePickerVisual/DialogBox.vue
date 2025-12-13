@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useTemplateRef} from 'vue'
+import { useDialogPosition } from './useDialogPosition';
 
 const open = defineModel<boolean>({
   default: false,
@@ -8,19 +9,14 @@ const open = defineModel<boolean>({
 const props = defineProps<{
   parentRef: HTMLElement | null
 }>()
+const dialogBox = useTemplateRef<HTMLElement | null>('dialogBox')
 
-const dialogPosition = computed(() => {
-  if (!props.parentRef) {
-    return {}
-  }
-  const rect = props.parentRef.getBoundingClientRect()
-  const offset = 8
-  return {
-    top: `${rect.bottom + window.scrollY + offset}px`,
-    left: `${rect.left + window.scrollX}px`,
-    minWidth: `${rect.width}px`,
-  }
-})
+const { dialogPosition } = useDialogPosition(
+  open,
+  computed(() => props.parentRef),
+  dialogBox,
+)
+
 </script>
 
 <template>
@@ -32,7 +28,11 @@ const dialogPosition = computed(() => {
         @click.self="() => (open = false)"
         @keydown.escape="() => (open = false)"
       >
-        <div class="dialog-box-wrapper" :style="dialogPosition">
+        <div
+          ref="dialogBox"
+          class="dialog-box-wrapper"
+          :style="dialogPosition"
+        >
           <slot></slot>
         </div>
       </div>
@@ -50,6 +50,7 @@ const dialogPosition = computed(() => {
 }
 
 .dialog-box-wrapper {
+  z-index: 1000;
   position: absolute;
   background-color: white;
   border-radius: var(--ldp-radius);
