@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useTemplateRef} from 'vue'
 import { useDialogPosition } from './useDialogPosition';
+import { useFocusTrap } from './useFocusTrap';
 
 const open = defineModel<boolean>({
   default: false,
@@ -16,6 +17,8 @@ const { dialogPosition } = useDialogPosition(
   computed(() => props.parentRef),
   dialogBox,
 )
+
+useFocusTrap(open, dialogBox);
 
 </script>
 
