@@ -71,10 +71,10 @@ const {
       </tr>
     </thead>
     <tbody class="day-selector__body" role="grid"
-      @keydown.right="selectNextDay"
-      @keydown.left="selectPreviousDay"
-      @keydown.down="selectNextWeek"
-      @keydown.up="selectPreviousWeek"
+      @keydown.right.prevent="selectNextDay"
+      @keydown.left.prevent="selectPreviousDay"
+      @keydown.down.prevent="selectNextWeek"
+      @keydown.up.prevent="selectPreviousWeek"
     >
       <tr v-for="(week, index) in weeks" :key="index" role="row">
         <td v-for="dayToDisplay in week" :key="dayToDisplay.toDateString()" role="gridcell">
