@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { onMounted, useTemplateRef } from 'vue';
+import { useMonthGrid } from './useMonthGrid';
+
 const props = defineProps<{
   modelValue: number
 }>()
@@ -12,14 +15,38 @@ function getMonthName(monthIndex: number): string {
     new Date(0, monthIndex - 1),
   )
 }
+
+const monthSelector = useTemplateRef<HTMLElement>('monthSelector')
+
+const {
+  activeMonth,
+  selectNextMonth,
+  selectPreviousMonth,
+} = useMonthGrid(
+  monthSelector,
+  props.modelValue,
+)
+
+onMounted(() => {
+  monthSelector.value!.querySelector<HTMLElement>(`#month-${activeMonth.value}`)!.focus();
+})
+
 </script>
 
 <template>
-  <div class="month-selector">
+  <div
+    class="month-selector"
+    role="grid"
+    ref="monthSelector"
+    @keydown.left.prevent="selectPreviousMonth"
+    @keydown.right.prevent="selectNextMonth"
+  >
     <button
       v-for="monthIndex in 12"
       :key="monthIndex"
+      :tabindex="monthIndex === activeMonth ? 0 : -1"
       class="month-selector__month"
+      :id="`month-${monthIndex}`"
       :class="{ 'month-selector__month--selected': monthIndex === props.modelValue }"
       @click="() => emits('update:modelValue', monthIndex)"
     >

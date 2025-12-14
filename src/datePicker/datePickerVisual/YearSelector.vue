@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useYearGrid } from './useYearGrid';
 
 const props = defineProps<{
   min: number
   max: number
-  modelValue: number | undefined
+  modelValue?: number
 }>()
 
 const yearSelector = ref<HTMLElement | null>(null)
@@ -13,19 +14,40 @@ const emits = defineEmits<{
   (event: 'update:modelValue', value: number): void
 }>()
 
+const {
+  activeYear,
+  selectNextYear,
+  selectPreviousYear,
+  selectNextRow,
+  selectPreviousRow,
+} = useYearGrid(
+  yearSelector,
+  computed(() => props.min),
+  computed(() => props.max),
+  props.modelValue,
+)
+
 onMounted(() => {
-  yearSelector.value
-    ?.querySelector<HTMLElement>(`#year-${props.modelValue}`)
-    ?.scrollIntoView({ block: 'center' })
+  yearSelector.value!.querySelector<HTMLElement>(`#year-${activeYear.value}`)!.focus();
 })
+
 </script>
 
 <template>
-  <div class="year-selector" ref="yearSelector">
+  <div
+    class="year-selector"
+    ref="yearSelector"
+    role="grid"
+    @keydown.left.prevent="selectPreviousYear"
+    @keydown.right.prevent="selectNextYear"
+    @keydown.up.prevent="selectPreviousRow"
+    @keydown.down.prevent="selectNextRow"
+  >
     <button
       v-for="year of Array.from({ length: props.max - props.min + 1 }, (_, i) => props.min + i)"
       :key="year"
       :id="`year-${year}`"
+      :tabindex="year === activeYear ? 0 : -1"
       class="year-selector__year"
       :class="{ 'year-selector__year--selected': year === props.modelValue }"
       @click="() => emits('update:modelValue', year)"

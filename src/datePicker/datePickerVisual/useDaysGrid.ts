@@ -20,6 +20,7 @@ export function useDaysGrid(
 
 	function focusActiveDay() {
 		nextTick(() => {
+			// TODO scope selector to date picker only
 			const activeDayElement = document.querySelector('.day-card--active') as HTMLElement
 			activeDayElement?.focus()
 		})
