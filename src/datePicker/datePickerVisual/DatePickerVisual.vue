@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import DaySelector from './DaySelector.vue'
 import YearSelector from './YearSelector.vue'
 import MonthSelector from './MonthSelector.vue'
-import DialogBox from './DialogBox.vue'
+import DialogBox from './DialogBox/DialogBox.vue'
 import DateNavigation from './DateNavigation.vue'
 
 const props = defineProps<{
