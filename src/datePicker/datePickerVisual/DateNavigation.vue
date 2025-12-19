@@ -31,6 +31,7 @@ const currentMonthName = computed(() => {
     <div class="date-navigation__month-navigation">
       <button
         title="Mois précédent"
+        data-test-id="previous-month-button"
         @click="
           () => {
             if (visibleMonth === 1) {
@@ -47,6 +48,7 @@ const currentMonthName = computed(() => {
       </button>
       <button
         title="Mois suivant"
+        data-test-id="next-month-button"
         @click="
           () => {
             if (visibleMonth === 12) {

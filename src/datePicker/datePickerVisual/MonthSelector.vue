@@ -11,7 +11,7 @@ const emits = defineEmits<{
 }>()
 
 function getMonthName(monthIndex: number): string {
-  return Intl.DateTimeFormat(navigator.language || 'fr-FR', { month: 'long' }).format(
+  return Intl.DateTimeFormat(navigator.language, { month: 'long' }).format(
     new Date(0, monthIndex - 1),
   )
 }
