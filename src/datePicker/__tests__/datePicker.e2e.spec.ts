@@ -196,6 +196,9 @@ test.describe('visual date picker', () => {
 
 test.describe('visual regression', () => {
 	test('it should match the visual snapshot', async ({ mount, page }) => {
+		// 21/12/2025
+		await page.clock.install({ time: new Date('2025-12-21T12:00:00.000Z') });
+
 		const component = await mount(DatePicker);
 		const visualPickerButton = component.locator('.date-picker-open-button');
 		await visualPickerButton.click();
