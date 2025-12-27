@@ -6,11 +6,16 @@ const id = useId()
 
 const modelValue = defineModel<Date | undefined>()
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   label?: string
   hint?: string
+  /** Exemple: "DD/MM/YYYY" */
+  format?: string
+  placeholder?: string
   error?: string
-}>()
+}>(), {
+  format: 'DD/MM/YYYY',
+})
 
 const isError = computed(() => {
   return !!props.error
@@ -26,7 +31,11 @@ provide('isError', isError)
     <p v-if="props.hint" class="date-picker__hint" :id="`date-picker-${id}__hint`">
       {{ props.hint }}
     </p>
-    <DatePickerCombined v-model="modelValue" />
+    <DatePickerCombined
+      v-model="modelValue"
+      :format="props.format"
+      :placeholder="props.placeholder"
+    />
     <p v-if="props.error" class="date-picker__error" :id="`date-picker-${id}__error`">
       {{ props.error }}
     </p>

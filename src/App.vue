@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import DatePicker from './datePicker/DatePicker.vue'
 
 const date = ref<Date>()
+const date2 = ref<Date>()
 </script>
 
 <template>
@@ -37,9 +38,17 @@ const date = ref<Date>()
   Sit temporibus qui perspiciatis illo explicabo, fugit repellat. Deleniti at minus, repellendus dolorem dicta accusamus aut architecto provident? Impedit nemo commodi ducimus illum sed non ipsa dolores sit illo debitis!
   Alias assumenda corporis porro necessitatibus aliquid, possimus odit itaque aperiam, eveniet ut et nobis voluptate vel est quod non, voluptatum illo perferendis quisquam quaerat. Numquam earum repudiandae quia cupiditate tempora?</p>
   <DatePicker
-    label="Date de naissance"
+    label="Date de naissance, JJ/MM/AAAA"
     hint="Veuillez saisir votre date de naissance sous le format JJ/MM/AAAA"
-    error="Date invalide"
+    placeholder="JJ/MM/AAAA"
+    v-model="date"
+  />
+  <br>
+  <DatePicker
+    label="Date de rendez-vous, YYYY-MM-DD"
+    hint="Veuillez saisir la date de votre rendez-vous sous le format YYYY-MM-DD"
+    placeholder="AAAA-MM-JJ"
+    format="YYYY-MM-DD"
     v-model="date"
   />
   <p>date sélectionnée: {{ date ? date.toDateString() : 'Aucune' }}</p>

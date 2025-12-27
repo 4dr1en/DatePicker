@@ -7,6 +7,11 @@ import CalendarIcon from './icons/CalendarIcon.vue'
 const internalDate = defineModel<Date>()
 const textField = ref<typeof DatePickerInput>()
 
+const props = defineProps<{
+  format: string
+  placeholder?: string
+}>()
+
 const dateSelectorOpen = ref(false)
 watch(dateSelectorOpen, (isOpen) => {
   if (!isOpen) {
@@ -20,7 +25,12 @@ const isError = inject('isError') as boolean
 <template>
   <div>
     <div class="date-picker" :class="{ 'date-picker--error': isError }">
-      <DatePickerInput ref="textField" v-model="internalDate" />
+      <DatePickerInput
+        ref="textField"
+        v-model="internalDate"
+        :format="props.format"
+        :placeholder="props.placeholder"
+      />
       <button
         class="date-picker-open-button"
         aria-label="Ouvrir le sélecteur de date"
