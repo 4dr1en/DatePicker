@@ -34,4 +34,12 @@ jobs:
         cache: 'pnpm'
     - run: pnpm install --frozen-lockfile
     - run: pnpm run build
-    - run: pnpm test:unit
+    - run: pnpm run test:unit:coverage
+    
+    - name: Upload coverage to Codecov
+      if: matrix.node-version == '22.x'
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage/coverage-final.json
+        fail_ci_if_error: false
+        verbose: true
