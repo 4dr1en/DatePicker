@@ -33,7 +33,10 @@ watch(model, (newValue) => {
     return;
   }
   const date = parseDate(newValue, props.format);
-  if (date) emits('update:modelValue', date);
+
+  if (
+    date && date.getTime() !== props.modelValue?.getTime()
+  ) emits('update:modelValue', date);
 });
 
 const id = inject('id') as string;

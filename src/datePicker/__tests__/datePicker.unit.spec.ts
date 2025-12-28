@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 
 import { mount } from '@vue/test-utils'
 import DatePicker from '../DatePicker.vue'
+import DaySelector from '../datePickerVisual/DaySelector.vue'
 
 describe('DatePicker', () => {
 	it('By default the input has no value', () => {
@@ -119,6 +120,45 @@ describe('DatePicker', () => {
 			const emitted = wrapper.emitted('update:modelValue')
 			expect(emitted).toBeTruthy()
 			expect((emitted?.[0]?.[0] as Date)?.toLocaleDateString('en-UK')).toBe('14/02/2022')
+		})
+
+		it('emits only one event when the date is selected via the visual picker', async () => {
+			const wrapper = mount(DatePicker, {
+				props: {
+					modelValue: new Date('2022-01-01'),
+				},
+				attachTo: document.body,
+				global: {
+					stubs: {
+						Transition: false,
+					},
+				},
+			})
+
+			const visualPickerButton = wrapper.find('button.date-picker-open-button')
+			await visualPickerButton.trigger('click')
+
+			const dayButtons = wrapper.findComponent(DaySelector).findAll('button.day-card')
+			const dayButton = dayButtons.find(btn => btn.text().trim() === '15')!
+			expect(dayButton).toBeTruthy()
+			dayButton.trigger('click')
+
+			expect(wrapper.emitted('update:modelValue')?.length).toBe(1)
+			expect((wrapper.emitted('update:modelValue')?.[0]?.[0] as Date)?.toLocaleDateString('en-UK')).toBe('15/01/2022')
+
+			wrapper.unmount()
+		})
+
+		it('does not emit update:modelValue when the props modelValue is updated', async () => {
+			const wrapper = mount(DatePicker, {
+				props: {
+					modelValue: new Date(2022, 0, 1),
+				},
+			})
+
+			await wrapper.setProps({ modelValue: new Date(2029, 0, 1) })
+
+			expect(wrapper.emitted('update:modelValue')).toBeUndefined()
 		})
 	})
 })

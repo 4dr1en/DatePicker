@@ -206,3 +206,65 @@ test.describe('visual regression', () => {
 		await expect(visualPicker).toHaveScreenshot();
 	});
 });
+
+test.describe('formats', () => {
+	test('when the date is set using the visual picker, it should appear in the input in the correct format', async ({ mount, page }) => {
+		await page.clock.install({ time: new Date('2025-12-21T12:00:00.000Z') });
+
+		const component = await mount(DatePicker, {
+			props: {
+				format: 'YYYY-MM-DD',
+			},
+		});
+		const visualPickerButton = component.locator('.date-picker-open-button');
+		await visualPickerButton.click();
+		const visualPicker = page.locator('.date-picker-visual');
+		const dayButton = visualPicker.locator('button[aria-label="25 décembre 2025"]');
+		await dayButton.click();
+		const input = component.locator('input');
+		await expect(input).toHaveValue('2025-12-25');
+	});
+
+	test('when the date is typed in the input, it should be parsed according to the specified format', async ({ mount }) => {
+		const emmittedDates: Date[] = [];
+		const component = await mount(DatePicker, {
+			props: {
+				format: 'DD.MM.YYYY',
+			},
+			on: {
+				'update:modelValue': (date: Date) => {
+					emmittedDates.push(date);
+				},
+			},
+		});
+		const input = component.locator('input');
+		await input.fill('31012023');
+		await expect(input).toHaveValue('31.01.2023');
+		expect(emmittedDates).toEqual([new Date(2023, 0, 31)]);
+	});
+
+	test('when the date is set using the visual picker, it should be emmitted without errors', async ({ mount, page }) => {
+		await page.clock.install({ time: new Date(2027, 2, 15) });
+
+		const emmittedDates: Date[] = [];
+		const component = await mount(DatePicker, {
+			props: {
+				format: 'DD.MM.YYYY',
+			},
+			on: {
+				'update:modelValue': (date: Date) => {
+					emmittedDates.push(date);
+				},
+			},
+		});
+		const visualPickerButton = component.locator('.date-picker-open-button');
+		await visualPickerButton.click();
+		const visualPicker = page.locator('.date-picker-visual');
+		const dayButton = visualPicker.locator('button[aria-label="2 mars 2027"]');
+		await dayButton.click();
+		const input = component.locator('input');
+		await expect(input).toHaveValue('02.03.2027');
+		expect(emmittedDates).toEqual([new Date(2027, 2, 2)]);
+	});
+});
+
